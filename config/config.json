@@ -17,6 +17,7 @@
     "username": "qaozmwgkrejcmw",
     "database": "dakapp4j89krpk",
     "host": "localhost",
+    "servername": "localhost",
     "dialect": "postgres",
     "use_env_variable": "DATABASE_URL",
     "dialectOptions": {
