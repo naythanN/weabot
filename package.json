@@ -1,0 +1,35 @@
+{
+  "name": "weabot",
+  "version": "1.0.0",
+  "description": "Telegram waifu bot",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naythanN/weabot.git"
+  },
+  "keywords": [
+    "waifu",
+    "anime",
+    "bot",
+    "node"
+  ],
+  "author": "Nathan Nunes",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/naythanN/weabot/issues"
+  },
+  "homepage": "https://github.com/naythanN/weabot#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.6.2",
+    "sequelize-cli": "^6.2.0",
+    "telegraf": "^4.3.0"
+  }
+}
