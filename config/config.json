@@ -14,9 +14,8 @@
     "dialect": "postgres"
   },
   "production": {
-    "username": "nathan",
-    "password": "#weabotdb#",
-    "database": "weabotdb",
+    "username": "qaozmwgkrejcmw",
+    "database": "dakapp4j89krpk",
     "host": "localhost",
     "dialect": "postgres",
     "use_env_variable": "DATABASE_URL"
