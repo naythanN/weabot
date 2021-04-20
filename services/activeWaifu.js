@@ -1,5 +1,6 @@
-const activeWaifu = (name, participant, chat, photo, url) => {
+const activeWaifu = (id, name, participant, chat, photo, url) => {
     return {
+        waifuId:   id,
         waifuName: name,
         creator:   participant,
         createdAt: +new Date(),
