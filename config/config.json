@@ -16,8 +16,8 @@
   "production": {
     "username": "qaozmwgkrejcmw",
     "database": "dakapp4j89krpk",
-    "host": "localhost",
-    "servername": "localhost",
+    "host": "0.0.0.0",
+    "servername": "0.0.0.0",
     "dialect": "postgres",
     "use_env_variable": "DATABASE_URL"
   }

@@ -77,8 +77,6 @@ process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
 let listWaifus = []
 
-bot.launch()
-
 
 bot.hears('hi', (ctx) => ctx.reply('Hey there'))
 
@@ -364,3 +362,5 @@ bot.command('rwaifu', async (ctx) => {
 
     
 })
+
+bot.launch()
