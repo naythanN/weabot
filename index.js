@@ -20,7 +20,7 @@ let groupJSON
 
 bot.start( async (ctx) => {
     ctx.reply('Welcome')
-    db.Weabot.destroy({truncate: true})
+    //db.Weabot.destroy({truncate: true})
     chatID = await ctx.chat.id;
     group = await db.Weabot.findOrCreate({
         where: {groupID: chatID.toString()},
