@@ -1,7 +1,10 @@
 {
   "name": "weabot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Telegram waifu bot",
+  "engines" : {
+    "node": "15.12"
+  },
   "main": "index.js",
   "type": "module",
   "scripts": {
