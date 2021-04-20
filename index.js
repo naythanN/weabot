@@ -43,6 +43,30 @@ bot.start( async (ctx) => {
     
 })
 
+bot.command('cleanDB', async (ctx) => {
+    ctx.reply('Welcome')
+    db.Weabot.destroy({truncate: true})
+    chatID = await ctx.chat.id;
+    group = await db.Weabot.findOrCreate({
+        where: {groupID: chatID.toString()},
+        defaults:{
+            groupInfo: {
+                "waifusCaptured": [],
+                "waifusDead" : [],
+                "waifusNotGenerated": range(1, 36000),
+                "users": [],
+                "transactions": []
+            }
+        }
+    })
+    if (group[1] === true){
+        groupJSON = group[0].groupInfo
+    }else{
+        groupJSON = JSON.parse(group[0].groupInfo)
+        groupJSON.transactions = []
+    }
+    
+})
 
 
 
