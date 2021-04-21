@@ -14,15 +14,11 @@ function range(start, end) {
 
 const bot = new Telegraf (process.env.WAIFU)
 
-let chatID
-let group
-let groupJSON
 
-bot.start( async (ctx) => {
-    ctx.reply('Welcome')
-    //db.Weabot.destroy({truncate: true})
-    chatID = await ctx.chat.id;
-    group = await db.Weabot.findOrCreate({
+const setChatEnv = async (ctx) => {
+    let groupJSON
+    let chatID = await ctx.chat.id
+    let group = await db.Weabot.findOrCreate({
         where: {groupID: chatID.toString()},
         defaults:{
             groupInfo: {
@@ -37,7 +33,45 @@ bot.start( async (ctx) => {
     if (group[1] === true){
         groupJSON = group[0].groupInfo
     }else{
-        groupJSON = JSON.parse(group[0].groupInfo)
+        if (typeof group[0].groupInfo == "object"){
+            groupJSON = group[0].groupInfo
+        } else{
+            groupJSON = JSON.parse(group[0].groupInfo)
+        }
+        
+        groupJSON.transactions = []
+    }
+
+    return groupJSON
+}
+
+
+bot.start( async (ctx) => {
+    ctx.reply('Welcome')
+    let groupJSON
+    //db.Weabot.destroy({truncate: true})
+    let chatID = await ctx.chat.id;
+    let group = await db.Weabot.findOrCreate({
+        where: {groupID: chatID.toString()},
+        defaults:{
+            groupInfo: {
+                "waifusCaptured": [],
+                "waifusDead" : [],
+                "waifusNotGenerated": range(1, 36000),
+                "users": [],
+                "transactions": []
+            }
+        }
+    })
+    if (group[1] === true){
+        groupJSON = group[0].groupInfo
+    }else{
+        if (typeof group[0].groupInfo == "object"){
+            groupJSON = group[0].groupInfo
+        } else{
+            groupJSON = JSON.parse(group[0].groupInfo)
+        }
+        
         groupJSON.transactions = []
     }
     
@@ -46,8 +80,9 @@ bot.start( async (ctx) => {
 bot.command('cleanDB', async (ctx) => {
     ctx.reply('Welcome')
     db.Weabot.destroy({truncate: true})
-    chatID = await ctx.chat.id;
-    group = await db.Weabot.findOrCreate({
+    let groupJSON
+    let chatID = await ctx.chat.id;
+    let group = await db.Weabot.findOrCreate({
         where: {groupID: chatID.toString()},
         defaults:{
             groupInfo: {
@@ -82,6 +117,7 @@ bot.hears('hi', (ctx) => ctx.reply('Hey there'))
 
 
 bot.command('show', async (ctx) => {
+    let groupJSON = await setChatEnv(ctx)
     const waifuName = ctx.update.message.text.split(" ")[1]
     groupJSON.users.forEach( (user) => {
         if (user.id == ctx.from.id){
@@ -101,12 +137,14 @@ bot.command('show', async (ctx) => {
 })
 
 bot.command('cleanTrade', async (ctx) => {
+    let groupJSON = await setChatEnv(ctx)
     groupJSON.transactions.filter( (transaction) => {
         return (transaction.creator != ctx.from.id)
     })
 })
 
 bot.command('list', async (ctx) => {
+    let groupJSON = await setChatEnv(ctx)
     const waifuName = ctx.update.message.text.split(" ")[1]
     groupJSON.users.forEach( (element) => {
         if (element.id == ctx.from.id){
@@ -125,6 +163,7 @@ bot.command('list', async (ctx) => {
 
 
 bot.command('offer', async (ctx) => {
+    let groupJSON = await setChatEnv(ctx)
     let waifus = ctx.update.message.text.split(" ")
     await  ctx.reply(`${ctx.from.first_name} is offering the following waifus:  ${waifus.slice(1)}`)
     groupJSON.transactions.push({
@@ -137,7 +176,7 @@ bot.command('offer', async (ctx) => {
 })
 
 bot.command('propose', async (ctx) => {
-    console.log("holdon")
+    let groupJSON = await setChatEnv(ctx)
     let waifus = ctx.update.message.text.split(" ")
     let offer = ctx.message.reply_to_message
     if (typeof offer == "undefined"){
@@ -154,6 +193,8 @@ bot.command('propose', async (ctx) => {
 })
 
 bot.command('accept', async (ctx) => {
+    let chatID = await ctx.chat.id;
+    let groupJSON = await setChatEnv(ctx)
     let proposal = ctx.message.reply_to_message
     await  ctx.reply(`${ctx.from.first_name} is accepting ${proposal.from.first_name}'s proposal`)
 
@@ -213,8 +254,8 @@ bot.command('accept', async (ctx) => {
 
 
 bot.command('catch', async (ctx) => {
-
-
+    let chatID = await ctx.chat.id;
+    let groupJSON = await setChatEnv(ctx)
     const ids = groupJSON.users.map(a => a.id)
 
     if (ids.includes(ctx.from.id)){
@@ -280,7 +321,8 @@ bot.command('catch', async (ctx) => {
 })
 
 bot.command('rwaifu', async (ctx) => {
-
+    let chatID = await ctx.chat.id;
+    let groupJSON = await setChatEnv(ctx)
     const ids = groupJSON.users.map(a => a.id)
 
     if (ids.includes(ctx.from.id)){
@@ -290,6 +332,7 @@ bot.command('rwaifu', async (ctx) => {
             return
         } else{
             ctx.reply(`${ctx.from.first_name} Generated 10 waifus`)
+            user.lastRwaifu = +new Date()
         }
         
     }else{
@@ -363,10 +406,14 @@ bot.command('rwaifu', async (ctx) => {
     
 })
 
-bot.launch({
+
+
+bot.launch()
+
+/* bot.launch({
     webhook: {
         domain: process.env.URL || 'https://obscure-garden-43575.herokuapp.com/',
         port: process.env.PORT || 4000
 
     }
-})
+}) */
