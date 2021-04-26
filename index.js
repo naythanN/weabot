@@ -148,8 +148,9 @@ bot.command('patch', async (ctx) => {
             let result = []
             groupJSON.users.forEach(user => {
                 let found = user.waifus.find(yes => yes.id == element)
-                result.push(found)
-
+                if (typeof found != "undefined"){
+                    result.push(found.id)
+                }
             })
             if (result.includes(element)){
                 return false
