@@ -158,6 +158,7 @@ bot.command('patch', async (ctx) => {
             return true
         })
         groupJSON.waifusNotGenerated = notGenerated
+        groupJSON.transactions = []
         try {
             const result = await db.Weabot.update(
                 {groupInfo: JSON.stringify(groupJSON)},
@@ -201,12 +202,22 @@ bot.command('show', async (ctx) => {
 
 bot.command('cleanTrade', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
+    let chatID = ctx.chat.id;
     groupJSON.transactions.filter( (transaction) => {
         return (transaction.creator != ctx.from.id)
     })
+
+    try {
+        const result = await db.Weabot.update(
+            {groupInfo: JSON.stringify(groupJSON)},
+            {where: {groupID: chatID}}
+        )
+    } catch (err){
+        console.log(err)
+    }
 })
 
-bot.command('list', async (ctx) => {
+bot.command('fullList', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
     let response = ""
     groupJSON.users.forEach( (element) => {
@@ -214,6 +225,28 @@ bot.command('list', async (ctx) => {
             element.waifus.forEach( async (waifu) => {
                 response += waifu.name + ", " + waifu.id + "\n"
             })
+        }
+    })
+
+    try {
+        await ctx.reply(response)    
+    } catch (error) {
+        console.error(error)
+    }
+
+})
+
+bot.command('list', async (ctx) => {
+    let groupJSON = await setChatEnv(ctx)
+    let response = ""
+    groupJSON.users.forEach( (element) => {
+        if (element.id == ctx.from.id){
+
+            for (let index = element.waifus.length - 1; index > element.waifus.length - 20 && index >= 0; index--) {
+
+                response += element.waifus[index].name + ", " + element.waifus[index].id + "\n"
+                
+            }
         }
     })
 
@@ -255,7 +288,7 @@ bot.command('top', async (ctx) =>{
 
 bot.command('offer', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
-    let chatID = await ctx.chat.id;
+    let chatID = ctx.chat.id;
     let waifus = ctx.update.message.text.split(" ")
     await  ctx.reply(`${ctx.from.first_name} is offering the following waifus:  ${waifus.slice(1)}`)
     groupJSON.transactions.push({
@@ -321,6 +354,18 @@ bot.command('accept', async (ctx) => {
             console.log(checkProposer)
             console.log(notUndefCreator)
             console.log(notUndefProposal)
+            groupJSON.transactions.filter( (transaction) => {
+                return (transaction.creator != ctx.from.id)
+            })
+        
+            try {
+                const result = await db.Weabot.update(
+                    {groupInfo: JSON.stringify(groupJSON)},
+                    {where: {groupID: chatID}}
+                )
+            } catch (err){
+                console.log(err)
+            }
             return
         } else{
             await  ctx.reply(`This trade is valid`)
@@ -438,7 +483,7 @@ bot.command('rwaifu', async (ctx) => {
 
     if (ids.includes(ctx.from.id)){
         let user = groupJSON.users.find(element => element.id == ctx.from.id)
-        if (Math.floor(Math.abs(+new Date() - user.lastRwaifu))/1000 < 60*60){
+        if (Math.floor(Math.abs(+new Date() - user.lastRwaifu))/1000 < 60){
             ctx.reply(`${ctx.from.first_name} Already used their rwaifu, ${new Date(user.lastRwaifu)}`)
             return
         } else{
@@ -496,7 +541,20 @@ bot.command('rwaifu', async (ctx) => {
                     photoFileInfo = await ctx.replyWithPhoto(photoData.data.data[0].path)
                     i = 5
                     console.log(waifuData.data.data.name)
-                    groupJSON.activeWaifus.push(activeWaifu(newWaifu, waifuData.data.data.name, ctx.chatMember, ctx.chat.id, photoFileInfo.photo[0].file_unique_id, photoData.data.data[0].path))
+                    
+
+                    let re = /["'(),]/gi
+                    let correctWaifuName = waifuData.data.data.name.replace(re, "")
+
+                    groupJSON.activeWaifus.push(activeWaifu(newWaifu, correctWaifuName, ctx.chatMember, ctx.chat.id, photoFileInfo.photo[0].file_unique_id, photoData.data.data[0].path))
+                    try {
+                        const result = await db.Weabot.update(
+                            {groupInfo: JSON.stringify(groupJSON)},
+                            {where: {groupID: chatID}}
+                        )
+                    } catch (err){
+                        console.log(err)
+                    }
                 } catch (error) {
                     console.log(error)
                 }    
@@ -518,8 +576,8 @@ bot.command('rwaifu', async (ctx) => {
 })
 
 
-//bot.launch()
-
+/* bot.launch()
+ */
 bot.launch({
     webhook: {
         domain: process.env.URL || 'https://obscure-garden-43575.herokuapp.com/',
