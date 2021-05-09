@@ -483,7 +483,7 @@ bot.command('rwaifu', async (ctx) => {
 
     if (ids.includes(ctx.from.id)){
         let user = groupJSON.users.find(element => element.id == ctx.from.id)
-        if (Math.floor(Math.abs(+new Date() - user.lastRwaifu))/1000 < 60){
+        if (Math.floor(Math.abs(+new Date() - user.lastRwaifu))/1000 < 60*60){
             ctx.reply(`${ctx.from.first_name} Already used their rwaifu, ${new Date(user.lastRwaifu)}`)
             return
         } else{
