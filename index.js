@@ -344,10 +344,23 @@ bot.command('accept', async (ctx) => {
 
     let transaction = groupJSON.transactions.find(element => element.creator == ctx.from.id)
     if (transaction.creator == ctx.from.id){
-        let checkCreator = transaction.waifusOffered.every(val => groupJSON.users.find(user => user.id == ctx.from.id).waifus.map(element => element.id).includes(val))
-        let checkProposer = transaction.waifusProposed.every(val => groupJSON.users.find(user => user.id == proposal.from.id).waifus.map(element => element.id).includes(val))
-        let notUndefCreator = groupJSON.users.find(user => user.id == ctx.from.id) != "undefined"
-        let notUndefProposal = groupJSON.users.find(user => user.id == proposal.from.id) != "undefined"
+
+        let checkCreator
+        let checkProposer
+        let notUndefCreator
+        let notUndefProposal
+
+        try {
+            checkCreator = transaction.waifusOffered.every(val => groupJSON.users.find(user => user.id == ctx.from.id).waifus.map(element => element.id).includes(val))
+            checkProposer = transaction.waifusProposed.every(val => groupJSON.users.find(user => user.id == proposal.from.id).waifus.map(element => element.id).includes(val))
+            notUndefCreator = groupJSON.users.find(user => user.id == ctx.from.id) != "undefined"
+            notUndefProposal = groupJSON.users.find(user => user.id == proposal.from.id) != "undefined"            
+        } catch (error) {
+            console.log(error)
+            return
+        }
+
+
         if (checkCreator == false || checkProposer == false || notUndefCreator == false || notUndefProposal == false){
             await  ctx.reply(`This trade is invalid`)
             console.log(checkCreator)
