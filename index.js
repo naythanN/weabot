@@ -217,6 +217,23 @@ bot.command('cleanTrade', async (ctx) => {
     }
 })
 
+bot.command('cleanTradeGlobal', async (ctx) => {
+    let groupJSON = await setChatEnv(ctx)
+    let chatID = ctx.chat.id;
+    ctx.reply("All trades cleaned")
+    groupJSON.transactions = []
+
+    try {
+        const result = await db.Weabot.update(
+            {groupInfo: JSON.stringify(groupJSON)},
+            {where: {groupID: chatID}}
+        )
+    } catch (err){
+        console.log(err)
+    }
+})
+
+
 bot.command('fullList', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
     let response = ""
