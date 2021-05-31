@@ -108,6 +108,40 @@ bot.command('cleanDBadmin', async (ctx) => {
     
 })
 
+
+
+bot.command('remove', async (ctx) => {
+    if (ctx.from.id != 615990377){
+        ctx.reply("...")
+    }
+    let args = ctx.update.message.text.split(" ")
+    let groupJSON = await setChatEnv(ctx)
+    let chatID = ctx.chat.id;
+    groupJSON.users.forEach( (element) => {
+        if (element.id == args[1]){
+            element.waifus = element.waifus.filter(waifu => {
+                if(waifu.id == args[2]){
+                    return false
+                }
+                else{
+                    return true
+                }
+                
+            })
+        }
+    })
+        
+    try {
+        const result = await db.Weabot.update(
+            {groupInfo: JSON.stringify(groupJSON)},
+            {where: {groupID: chatID}}
+        )
+    } catch (err){
+        console.log(err)
+    }
+
+})
+
 bot.command('patch', async (ctx) => {
     if (ctx.from.id != 615990377){
         ctx.reply("Vai se fuder sua puta :)")
@@ -143,7 +177,7 @@ bot.command('patch', async (ctx) => {
             groupJSON.activeWaifus = []
         }
         
-        let notGenerated = range(1, 36000)
+        let notGenerated = range(1, 36200)
         notGenerated = notGenerated.filter(element => {
             let result = []
             groupJSON.users.forEach(user => {
@@ -237,10 +271,25 @@ bot.command('cleanTradeGlobal', async (ctx) => {
 bot.command('fullList', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
     let response = ""
+    let size = 0
     groupJSON.users.forEach( (element) => {
         if (element.id == ctx.from.id){
             element.waifus.forEach( async (waifu) => {
                 response += waifu.name + ", " + waifu.id + "\n"
+
+                size += 1
+                if(size > 100){
+                    try {
+                        await ctx.reply(response)
+
+                    } catch (error) {
+                        console.error(error)
+                    }
+                    response = ""
+                    size = 0
+
+                }
+
             })
         }
     })
@@ -256,6 +305,7 @@ bot.command('fullList', async (ctx) => {
 bot.command('list', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
     let response = ""
+    
     groupJSON.users.forEach( (element) => {
         if (element.id == ctx.from.id){
 
@@ -450,6 +500,7 @@ bot.command('catch', async (ctx) => {
         ctx.reply(`${ctx.from.first_name} is trying to catch a waifu for the first time`)
         groupJSON.users.push({
             "id": ctx.from.id,
+            "name": ctx.from.first_name,
             "waifus": [],
             "lastRwaifu": +new Date()
         })
@@ -499,7 +550,7 @@ bot.command('catch', async (ctx) => {
                 }
 
             }else{
-                ctx.reply("Baka :), wrong waifu name.")
+                ctx.reply("Wrong waifu name :(")
             }
         }
     }
@@ -525,6 +576,7 @@ bot.command('rwaifu', async (ctx) => {
         ctx.reply(`${ctx.from.first_name} Generated 10 waifus for the first time`)
         groupJSON.users.push({
             "id": ctx.from.id,
+            "name": ctx.from.first_name,
             "waifus": [],
             "lastRwaifu": +new Date()
         })
@@ -548,14 +600,14 @@ bot.command('rwaifu', async (ctx) => {
     })
 
     if (groupJSON.waifusNotGenerated.length % 3000 == 0){
-        let waifuReturn = groupJSON.waifusDead.splice(0, 1500)
+        let waifuReturn = groupJSON.waifusDead.splice(0, 150)
         groupJSON.waifusNotGenerated.push(...waifuReturn)
     }
 
-    if (groupJSON.waifusNotGenerated.length < 3000){
+/*     if (groupJSON.waifusNotGenerated.length < 3000){
         let waifuReturn = groupJSON.waifusDead.splice(0, 15000)
         groupJSON.waifusNotGenerated.push(...waifuReturn)
-    }
+    } */
 
     for (let i = 0; i < 10; i++) {
         let random = Math.floor(Math.random() * groupJSON.waifusNotGenerated.length);
@@ -582,6 +634,7 @@ bot.command('rwaifu', async (ctx) => {
                             {groupInfo: JSON.stringify(groupJSON)},
                             {where: {groupID: chatID}}
                         )
+                        groupJSON = await setChatEnv(ctx)
                     } catch (err){
                         console.log(err)
                     }
@@ -606,8 +659,9 @@ bot.command('rwaifu', async (ctx) => {
 })
 
 
-/* bot.launch()
- */
+//bot.launch()
+
+
 bot.launch({
     webhook: {
         domain: process.env.URL || 'https://obscure-garden-43575.herokuapp.com/',
