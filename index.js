@@ -142,6 +142,57 @@ bot.command('remove', async (ctx) => {
 
 })
 
+
+
+bot.command('minipatch', async (ctx) => {
+    if (ctx.from.id != 615990377){
+        ctx.reply("Vai se fuder sua puta :)")
+        return
+    } else{
+        ctx.reply("Mini patch applied successfully")
+    }
+    ctx.reply('Welcome')
+
+    let groupJSON
+    let chatID = await ctx.chat.id;
+    let group = await db.Weabot.findOrCreate({
+        where: {groupID: chatID.toString()},
+        defaults:{
+            groupInfo: {
+                "waifusCaptured": [],
+                "waifusDead" : [],
+                "waifusNotGenerated": range(1, 36000),
+                "users": [],
+                "transactions": [],
+                "activeWaifus": []
+            }
+        }
+    })
+    if (group[1] === true){
+        groupJSON = group[0].groupInfo
+    }else{
+        groupJSON = JSON.parse(group[0].groupInfo)
+        
+        
+        let more = range(36200, 37200)
+
+        groupJSON.waifusNotGenerated = groupJSON.waifusNotGenerated.concat(more)
+        groupJSON.transactions = []
+        try {
+            const result = await db.Weabot.update(
+                {groupInfo: JSON.stringify(groupJSON)},
+                {where: {groupID: chatID}}
+            )
+        } catch (err){
+            console.log(err)
+        }
+    }
+    
+})
+
+
+
+
 bot.command('patch', async (ctx) => {
     if (ctx.from.id != 615990377){
         ctx.reply("Vai se fuder sua puta :)")
@@ -609,7 +660,7 @@ bot.command('rwaifu', async (ctx) => {
         groupJSON.waifusNotGenerated.push(...waifuReturn)
     } */
 
-    for (let i = 0; i < 10; i++) {
+    for (let j = 0; j < 10; j++) {
         let random = Math.floor(Math.random() * groupJSON.waifusNotGenerated.length);
         let newWaifu = groupJSON.waifusNotGenerated[random]
         groupJSON.waifusNotGenerated.splice(random, 1)
@@ -621,7 +672,6 @@ bot.command('rwaifu', async (ctx) => {
             for (let i = 0; i < 3; i++) {
                 try {
                     photoFileInfo = await ctx.replyWithPhoto(photoData.data.data[0].path)
-                    i = 5
                     console.log(waifuData.data.data.name)
                     
 
@@ -639,6 +689,9 @@ bot.command('rwaifu', async (ctx) => {
                         console.log(err)
                     }
                 } catch (error) {
+                    if(i == 2){
+                        j -= 1
+                    }
                     console.log(error)
                 }    
             }
