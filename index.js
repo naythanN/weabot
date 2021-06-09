@@ -669,31 +669,27 @@ bot.command('rwaifu', async (ctx) => {
         if (typeof urlData !== 'undefined'){
             let waifuData = urlData[0]
             let photoData = urlData[1]
-            for (let i = 0; i < 3; i++) {
+            try {
+                photoFileInfo = await ctx.replyWithPhoto(photoData.data.data[0].path)
+                console.log(waifuData.data.data.name)
+                
+
+                let re = /["'(),]/gi
+                let correctWaifuName = waifuData.data.data.name.replace(re, "")
+
+                groupJSON.activeWaifus.push(activeWaifu(newWaifu, correctWaifuName, ctx.chatMember, ctx.chat.id, photoFileInfo.photo[0].file_unique_id, photoData.data.data[0].path))
                 try {
-                    photoFileInfo = await ctx.replyWithPhoto(photoData.data.data[0].path)
-                    console.log(waifuData.data.data.name)
-                    
-
-                    let re = /["'(),]/gi
-                    let correctWaifuName = waifuData.data.data.name.replace(re, "")
-
-                    groupJSON.activeWaifus.push(activeWaifu(newWaifu, correctWaifuName, ctx.chatMember, ctx.chat.id, photoFileInfo.photo[0].file_unique_id, photoData.data.data[0].path))
-                    try {
-                        const result = await db.Weabot.update(
-                            {groupInfo: JSON.stringify(groupJSON)},
-                            {where: {groupID: chatID}}
-                        )
-                        groupJSON = await setChatEnv(ctx)
-                    } catch (err){
-                        console.log(err)
-                    }
-                } catch (error) {
-                    if(i == 2){
-                        j -= 1
-                    }
-                    console.log(error)
-                }    
+                    const result = await db.Weabot.update(
+                        {groupInfo: JSON.stringify(groupJSON)},
+                        {where: {groupID: chatID}}
+                    )
+                    groupJSON = await setChatEnv(ctx)
+                } catch (err){
+                    console.log(err)
+                }
+            } catch (error) {
+                j -= 1
+                console.log(error)
             }
         }
         
