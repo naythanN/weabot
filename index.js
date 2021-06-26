@@ -330,12 +330,8 @@ bot.command('fullList', async (ctx) => {
 
                 size += 1
                 if(size > 100){
-                    try {
-                        await ctx.reply(response)
-
-                    } catch (error) {
-                        console.error(error)
-                    }
+                    
+                    await ctx.reply(response)
                     response = ""
                     size = 0
 
@@ -408,7 +404,7 @@ bot.command('offer', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
     let chatID = ctx.chat.id;
     let waifus = ctx.update.message.text.split(" ")
-    await  ctx.reply(`${ctx.from.first_name} is offering the following waifus:  ${waifus.slice(1)}`)
+    await  ctx.reply(`${ctx.from.first_name} is offering the following characters:  ${waifus.slice(1)}`)
     groupJSON.transactions.push({
         "creator": ctx.from.id,
         "waifusOffered": waifus.slice(1).map(Number),
@@ -436,7 +432,7 @@ bot.command('propose', async (ctx) => {
         ctx.reply(`You have to answer an offer`)
         return
     }
-    await  ctx.reply(`${ctx.from.first_name} is proposing ${offer.from.first_name} the following waifus:  ${waifus.slice(1)}`)
+    await  ctx.reply(`${ctx.from.first_name} is proposing ${offer.from.first_name} the following characters:  ${waifus.slice(1)}`)
     groupJSON.transactions.forEach( (element) => {
         if (element.creator == offer.from.id){
             element.target = ctx.from.id
@@ -546,9 +542,9 @@ bot.command('catch', async (ctx) => {
     const ids = groupJSON.users.map(a => a.id)
 
     if (ids.includes(ctx.from.id)){
-        console.log(`${ctx.from.first_name} is trying to catch this waifu`)
+        console.log(`${ctx.from.first_name} is trying to catch this character`)
     }else{
-        ctx.reply(`${ctx.from.first_name} is trying to catch a waifu for the first time`)
+        ctx.reply(`${ctx.from.first_name} is trying to catch a character for the first time`)
         groupJSON.users.push({
             "id": ctx.from.id,
             "name": ctx.from.first_name,
@@ -569,15 +565,15 @@ bot.command('catch', async (ctx) => {
     const waifuName = ctx.update.message.text.split(" ")[1]
     const waifu = ctx.message.reply_to_message;
     if (typeof waifu === 'undefined'){
-        ctx.reply("Remember to pass a name and reply the correct waifu photo")
+        ctx.reply("Remember to pass a name and reply the correct character photo")
     }else{
         const waifuActive = groupJSON.activeWaifus.find(element => element.photoId == waifu.photo[0].file_unique_id)
 
         if (typeof waifuActive === 'undefined' || typeof waifuName === 'undefined'){
-            ctx.reply("This waifu isnt currently active or is not a waifu at all. Or... you should at least pass a name")
+            ctx.reply("This character isnt currently active or is not a char at all. Or... you should at least pass a name")
         } else{
             if (waifuActive.waifuName.toLowerCase().split(" ").includes(waifuName.toLowerCase()) || waifuActive.waifuName.toLowerCase() == waifuName.toLowerCase()){
-                ctx.reply("You got the waifu, nice")
+                ctx.reply(`You got this char, very nice ${ctx.message.from.first_name}-chan`)
                 groupJSON.activeWaifus = groupJSON.activeWaifus.filter(waifu => {
                     return (waifu.waifuName != waifuActive.waifuName)
                 })
@@ -601,14 +597,14 @@ bot.command('catch', async (ctx) => {
                 }
 
             }else{
-                ctx.reply("Wrong waifu name :(")
+                ctx.reply(`Baka ${ctx.message.from.first_name}, the name is wrong ::))`)
             }
         }
     }
     
 })
 
-bot.command('rwaifu', async (ctx) => {
+bot.command('rchar', async (ctx) => {
     let chatID = await ctx.chat.id;
     let groupJSON = await setChatEnv(ctx)
     const ids = groupJSON.users.map(a => a.id)
@@ -616,15 +612,15 @@ bot.command('rwaifu', async (ctx) => {
     if (ids.includes(ctx.from.id)){
         let user = groupJSON.users.find(element => element.id == ctx.from.id)
         if (Math.floor(Math.abs(+new Date() - user.lastRwaifu))/1000 < 60*60){
-            ctx.reply(`${ctx.from.first_name} Already used their rwaifu, ${new Date(user.lastRwaifu)}`)
+            ctx.reply(`${ctx.from.first_name} Already used their rchar, ${new Date(user.lastRwaifu)}`)
             return
         } else{
-            ctx.reply(`${ctx.from.first_name} Generated some waifus`)
+            ctx.reply(`${ctx.from.first_name} Generated some chars`)
             user.lastRwaifu = +new Date()
         }
         
     }else{
-        ctx.reply(`${ctx.from.first_name} Generated 10 waifus for the first time`)
+        ctx.reply(`${ctx.from.first_name} Generated 10 chars for the first time`)
         groupJSON.users.push({
             "id": ctx.from.id,
             "name": ctx.from.first_name,
