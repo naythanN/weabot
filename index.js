@@ -332,7 +332,7 @@ bot.command('fullList', async (ctx) => {
         }
     })
 
-    let responses = response.match(/(.|[\r\n]){1,100}/g)
+    let responses = response.match(/(?=[\s\S])(?:.*\n?){1,100}/g)
 
     responses.forEach( async (block) => {
         try {
