@@ -700,13 +700,13 @@ bot.command('rchar', async (ctx) => {
 })
 
 
-bot.launch()
+//bot.launch()
 
 
-/* bot.launch({
+bot.launch({
     webhook: {
         domain: process.env.URL || 'https://obscure-garden-43575.herokuapp.com/',
         port: process.env.PORT || 4000
 
     }
-}) */
+})
