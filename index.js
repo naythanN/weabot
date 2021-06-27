@@ -328,24 +328,20 @@ bot.command('fullList', async (ctx) => {
             element.waifus.forEach( async (waifu) => {
                 response += waifu.name + ", " + waifu.id + "\n"
 
-                size += 1
-                if(size > 100){
-                    
-                    await ctx.reply(response)
-                    response = ""
-                    size = 0
-
-                }
-
             })
         }
     })
 
-    try {
-        await ctx.reply(response)    
-    } catch (error) {
-        console.error(error)
-    }
+    let responses = response.match(/(.|[\r\n]){1,100}/g)
+
+    responses.forEach( async (block) => {
+        try {
+            await ctx.reply(block)    
+        } catch (error) {
+            console.error(error)
+        }
+    })
+    
 
 })
 
@@ -704,13 +700,13 @@ bot.command('rchar', async (ctx) => {
 })
 
 
-//bot.launch()
+bot.launch()
 
 
-bot.launch({
+/* bot.launch({
     webhook: {
         domain: process.env.URL || 'https://obscure-garden-43575.herokuapp.com/',
         port: process.env.PORT || 4000
 
     }
-})
+}) */
