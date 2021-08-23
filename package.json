@@ -1,9 +1,9 @@
 {
   "name": "weabot",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Telegram waifu bot",
-  "engines" : {
-    "node": "15.12"
+  "engines": {
+    "node": "16.6"
   },
   "main": "index.js",
   "type": "module",
@@ -30,10 +30,11 @@
   "dependencies": {
     "axios": "^0.21.1",
     "dotenv": "^8.2.0",
+    "lodash": "^4.17.21",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^6.6.2",
+    "sequelize": "^6.6.5",
     "sequelize-cli": "^6.2.0",
-    "telegraf": "^4.3.0"
+    "telegraf": "^4.4.1"
   }
 }
