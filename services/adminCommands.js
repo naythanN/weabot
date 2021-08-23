@@ -80,6 +80,7 @@ export const minipatchCommand = Composer.command('minipatch', async (ctx) => {
         groupJSON = JSON.parse(group[0].groupInfo)
         
         //groupJSON.users[0].waifus = []
+        let waifuData = await getWaifuData(36463);
         groupJSON.transactions = []
         try {
             const result = await db.Weabot.update(
@@ -100,9 +101,9 @@ export const patchCommand =  Composer.command('patch', async (ctx) => {
         ctx.reply("Vai se fuder sua puta :)")
         return
     } else{
-        ctx.reply("Patch applied successfully")
+        ctx.reply('Welcome')
     }
-    ctx.reply('Welcome')
+    
 
     let groupJSON
     let chatID = await ctx.chat.id;
@@ -154,13 +155,22 @@ export const patchCommand =  Composer.command('patch', async (ctx) => {
                 if (!waifu.hasOwnProperty('series')){
                     let waifuData = await getWaifuData(waifu.id);
                     
-                    if (!waifuData.data.data.series){
+                    if (!waifuData && !waifuData.data.data.series){
                         waifu.series = "Extra"
                     } else {
                         waifu.series = waifuData.data.data.series.name
                     }
                     
                 }
+            }
+
+            try {
+                const result = await db.Weabot.update(
+                    {groupInfo: JSON.stringify(groupJSON)},
+                    {where: {groupID: chatID}}
+                )
+            } catch (err){
+                console.log(err)
             }
             
         }
@@ -190,6 +200,7 @@ export const patchCommand =  Composer.command('patch', async (ctx) => {
         } catch (err){
             console.log(err)
         }
+        ctx.reply("Patch applied successfully")
     }
     
 })

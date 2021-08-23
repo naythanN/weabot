@@ -11,8 +11,6 @@ const getWaifuData = async (number) => {
         })
     } catch (e){
         console.error(e)
-    } finally {
-        console.log(`Deu bom ${number}`);
     }
     try {
         if (result.data == ''){
