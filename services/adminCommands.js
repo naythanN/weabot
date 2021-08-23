@@ -154,7 +154,7 @@ export const patchCommand =  Composer.command('patch', async (ctx) => {
                 if (!waifu.hasOwnProperty('series')){
                     let waifuData = await getWaifuData(waifu.id);
                     
-                    if (waifuData.data.data.series === undefined){
+                    if (!waifuData.data.data.series){
                         waifu.series = "Extra"
                     } else {
                         waifu.series = waifuData.data.data.series.name
