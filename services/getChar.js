@@ -9,6 +9,7 @@ const getWaifuData = async (number) => {
                 'x-requested-with': 'XMLHttpRequest'
             }
         })
+        //console.log(result)
     } catch (e){
         console.error(e)
     }

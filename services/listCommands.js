@@ -1,4 +1,4 @@
-import { range, setChatEnv } from '../src/usefulFunctions.js'
+import { range, setChatEnv, sleep } from '../src/usefulFunctions.js'
 
 import db from '../models/index.js'
 
@@ -51,11 +51,11 @@ export const fullListCommand = Composer.command('fullList', async (ctx) => {
             })
             
             for (const [key, value] of Object.entries(grouped)) {
-                response += key + "\n" + "\n"
+                response += key + "\n\n"
                 value.forEach( (waifu) => {
                     response += waifu.name + ", " + waifu.id + "\n"
                 })
-                response += "\n"
+                response += "-------------------\n"
             }
         }
     })
@@ -63,13 +63,14 @@ export const fullListCommand = Composer.command('fullList', async (ctx) => {
     let responses = response.match(/(?=[\s\S])(?:.*\n?){1,100}/g)
 
     if (responses){
-        responses.forEach( async (block) => {
+        for (let block of responses) {
             try {
-                await ctx.reply(block)    
+                await ctx.reply(block)
+                await sleep(500) 
             } catch (error) {
                 console.error(error)
             }
-        })
+        }
     }
     
 
@@ -99,7 +100,7 @@ export const listCommand = Composer.command('list', async (ctx) => {
 })
 
 export const topCommand = Composer.command('top', async (ctx) =>{
-
+    let chatID = await ctx.chat.id;
     let topArray = []
     let groupJSON = await setChatEnv(ctx)
     groupJSON.users.forEach( (element) => {
@@ -131,6 +132,16 @@ export const topCommand = Composer.command('top', async (ctx) =>{
     topArray.forEach( (element) => {
         response += element.user + ": " + element.size + "\n"
     })
+
+    try {
+        const result = await db.Weabot.update(
+            {groupInfo: JSON.stringify(groupJSON)},
+            {where: {groupID: chatID}}
+        )
+        groupJSON = await setChatEnv(ctx)
+    } catch (err){
+        console.log(err)
+    }
 
 
     try {

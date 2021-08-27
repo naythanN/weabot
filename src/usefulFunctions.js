@@ -37,4 +37,8 @@ const setChatEnv = async (ctx) => {
     return groupJSON
 }
 
-export {range, setChatEnv}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export {range, setChatEnv, sleep}

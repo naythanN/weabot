@@ -11,7 +11,7 @@ import {activeWaifu} from './services/activeChar.js'
 import { range, setChatEnv } from './src/usefulFunctions.js'
 
 import {catchCommand, rcharCommand } from './services/generationCommands.js'
-import {minipatchCommand, patchCommand } from './services/adminCommands.js'
+import {minipatchCommand } from './services/adminCommands.js'
 import { offerCommand, proposeCommand, acceptCommand } from './services/tradeCommands.js'
 import {listCommand, fullListCommand, topCommand, showCommand, setPhotoCommand } from './services/listCommands.js'
 
@@ -28,7 +28,7 @@ bot.start( async (ctx) => {
             groupInfo: {
                 "waifusCaptured": [],
                 "waifusDead" : [],
-                "waifusNotGenerated": range(1, 36000),
+                "waifusNotGenerated": range(1, 50000),
                 "users": [],
                 "transactions": [],
                 "activeWaifus": []
@@ -49,7 +49,7 @@ bot.start( async (ctx) => {
     
 })
 
-bot.use(catchCommand, rcharCommand, topCommand, showCommand, setPhotoCommand, fullListCommand, listCommand, offerCommand, proposeCommand, acceptCommand, minipatchCommand, patchCommand)
+bot.use(catchCommand, rcharCommand, topCommand, showCommand, setPhotoCommand, fullListCommand, listCommand, offerCommand, proposeCommand, acceptCommand, minipatchCommand)
 
 /* bot.command('cleanDBadmin', async (ctx) => {
     if (ctx.from.id != 615990377){
@@ -159,13 +159,142 @@ bot.command('cleanTradeGlobal', async (ctx) => {
 })
 
 
-//bot.launch()
+bot.command('patch', async (ctx) => {
+    if (ctx.from.id != 615990377){
+        ctx.reply("Vai se fuder sua puta :)")
+        return
+    } else{
+        ctx.reply('Welcome')
+    }
+    
+
+    let groupJSON
+    let chatID = await ctx.chat.id;
+    let group = await db.Weabot.findOrCreate({
+        where: {groupID: chatID.toString()},
+        defaults:{
+            groupInfo: {
+                "waifusCaptured": [],
+                "waifusDead" : [],
+                "waifusNotGenerated": range(1, 50000),
+                "users": [],
+                "transactions": [],
+                "activeWaifus": []
+            }
+        }
+    })
+    if (group[1] === true){
+        groupJSON = group[0].groupInfo
+    }else{
+        groupJSON = JSON.parse(group[0].groupInfo)
+        if (groupJSON.hasOwnProperty("activeWaifus")){
+            console.log("nice")
+        }
+        else{
+            groupJSON.activeWaifus = []
+        }
+
+        // regenerate non-catched waifus
+        let notGenerated = range(1, 50000)
+        notGenerated = notGenerated.filter(element => {
+            let result = []
+            groupJSON.users.forEach(user => {
+                let found = user.waifus.find(yes => yes.id == element)
+                if (typeof found != "undefined"){
+                    result.push(found.id)
+                }
+            })
+            if (result.includes(element)){
+                return false
+            }
+            return true
+        })
+
+        //patch users whose waifus doesnt jave series properties
+
+        for (let user of groupJSON.users ){
+            let counter = 0
+            for ( let waifu of user.waifus ) {
+                if (!waifu.hasOwnProperty('series')){
+                    let waifuData
+                    try {
+                        waifuData = await getWaifuData(waifu.id);                    
+                        waifu.series = waifuData.data.data.series.name
+                         
+                    } catch (error) {
+                        console.log(error)
+                        waifu.series = "Extra"
+                    }
+                    counter += 1
+                    
+                    if (counter % 100 == 0){
+                        //await sleep(5000)
+                        ctx.reply(counter)
+                        try {
+                            const result = await db.Weabot.update(
+                                {groupInfo: JSON.stringify(groupJSON)},
+                                {where: {groupID: chatID}}
+                            )
+                        } catch (err){
+                            console.log(err)
+                        }
+
+                    }
+                    
+                    
+                }
+            }
+            console.log("passei")
+            try {
+                const result = await db.Weabot.update(
+                    {groupInfo: JSON.stringify(groupJSON)},
+                    {where: {groupID: chatID}}
+                )
+            } catch (err){
+                console.log(err)
+            }
+            
+        }
+        
+        // patch preferences
+
+        for (let user of groupJSON.users ){
+
+            if (!user.hasOwnProperty('preferences')){
+                user.preferences = {}
+            }   
+        }
+
+        // patch duplicate waifus
+
+        for (let user of groupJSON.users ){
+            user.waifus.filter((waifu, index, array) => array.findIndex(w => w.id == waifu.id) == index)
+        }
+
+        groupJSON.waifusNotGenerated = notGenerated
+        groupJSON.transactions = []
+        try {
+            const result = await db.Weabot.update(
+                {groupInfo: JSON.stringify(groupJSON)},
+                {where: {groupID: chatID}}
+            )
+        } catch (err){
+            console.log(err)
+        }
+        ctx.reply("Patch applied successfully")
+    }
+    
+}).catch(err => console.log(err))
 
 
-bot.launch({
+
+bot.launch()
+
+
+/* bot.launch({
     webhook: {
         domain: process.env.URL || 'https://obscure-garden-43575.herokuapp.com/',
         port: process.env.PORT || 4000
 
     }
-})
+}) */

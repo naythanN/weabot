@@ -133,7 +133,7 @@ export const rcharCommand = Composer.command('rchar', async (ctx) => {
         let photoFileInfo
 
         let waifuData = await getWaifuData(newWaifu);
-        if (typeof waifuData !== 'undefined'){
+        if (typeof waifuData !== 'undefined' && !groupJSON.waifusCaptured.includes(waifuData.name)){
             try {
                 photoFileInfo = await ctx.replyWithPhoto(waifuData.data.data.display_picture.replace("_thumb", ""))
                 console.log(waifuData.data.data.name)
