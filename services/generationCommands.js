@@ -117,10 +117,19 @@ export const rcharCommand = Composer.command('rchar', async (ctx) => {
         return true
     })
 
-    if (groupJSON.waifusNotGenerated.length % 3000 == 0){
+    try {
+        const result = await db.Weabot.update(
+            {groupInfo: JSON.stringify(groupJSON)},
+            {where: {groupID: chatID}}
+        )
+    } catch (err){
+        console.log(err)
+    }
+
+    /* if (groupJSON.waifusNotGenerated.length % 3000 == 0){
         let waifuReturn = groupJSON.waifusDead.splice(0, 1000)
         groupJSON.waifusNotGenerated.push(...waifuReturn)
-    }
+    } */
 
 /*     if (groupJSON.waifusNotGenerated.length < 3000){
         let waifuReturn = groupJSON.waifusDead.splice(0, 15000)

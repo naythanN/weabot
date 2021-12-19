@@ -26,6 +26,7 @@ export const offerCommand = Composer.command('offer', async (ctx) => {
 
 })
 
+
 export const proposeCommand = Composer.command('propose', async (ctx) => {
     let groupJSON = await setChatEnv(ctx)
     let chatID = await ctx.chat.id;

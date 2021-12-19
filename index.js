@@ -13,7 +13,7 @@ import { range, setChatEnv } from './src/usefulFunctions.js'
 import {catchCommand, rcharCommand } from './services/generationCommands.js'
 import {minipatchCommand } from './services/adminCommands.js'
 import { offerCommand, proposeCommand, acceptCommand } from './services/tradeCommands.js'
-import {listCommand, fullListCommand, topCommand, showCommand, setPhotoCommand } from './services/listCommands.js'
+import {listCommand, fullListCommand, topCommand, showCommand, setPhotoCommand, fullListAnimeCommand } from './services/listCommands.js'
 
 const bot = new Telegraf (process.env.WAIFU)
 
@@ -49,7 +49,7 @@ bot.start( async (ctx) => {
     
 })
 
-bot.use(catchCommand, rcharCommand, topCommand, showCommand, setPhotoCommand, fullListCommand, listCommand, offerCommand, proposeCommand, acceptCommand, minipatchCommand)
+bot.use(catchCommand, rcharCommand, topCommand, showCommand, setPhotoCommand, fullListCommand, fullListAnimeCommand, listCommand, offerCommand, proposeCommand, acceptCommand, minipatchCommand)
 
 /* bot.command('cleanDBadmin', async (ctx) => {
     if (ctx.from.id != 615990377){
@@ -161,7 +161,7 @@ bot.command('cleanTradeGlobal', async (ctx) => {
 
 bot.command('patch', async (ctx) => {
     if (ctx.from.id != 615990377){
-        ctx.reply("Vai se fuder sua puta :)")
+        ctx.reply(":)")
         return
     } else{
         ctx.reply('Welcome')
@@ -212,7 +212,7 @@ bot.command('patch', async (ctx) => {
 
         //patch users whose waifus doesnt jave series properties
 
-        for (let user of groupJSON.users ){
+        /* for (let user of groupJSON.users ){
             let counter = 0
             for ( let waifu of user.waifus ) {
                 if (!waifu.hasOwnProperty('series')){
@@ -263,7 +263,7 @@ bot.command('patch', async (ctx) => {
             if (!user.hasOwnProperty('preferences')){
                 user.preferences = {}
             }   
-        }
+        } */
 
         // patch duplicate waifus
 

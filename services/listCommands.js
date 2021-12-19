@@ -31,6 +31,7 @@ export const showCommand = Composer.command('show', async (ctx) => {
                 
                 
             } catch (error) {
+                await ctx.replyWithPhoto({url: await getPhotoData(waifu.id, photo)}, {caption: `${waifu.name}, ${waifu.id}`})
                 console.error(error)
             }
         }
@@ -72,8 +73,45 @@ export const fullListCommand = Composer.command('fullList', async (ctx) => {
             }
         }
     }
-    
+})
 
+
+export const fullListAnimeCommand = Composer.command('listAnime', async (ctx) => {
+    let groupJSON = await setChatEnv(ctx)
+    let response = ""
+    const animeName = ctx.update.message.text.split(" ")[1]
+    let size = 0
+    groupJSON.users.forEach( (element) => {
+        if (element.id == ctx.from.id){
+            let grouped = _.groupBy(element.waifus, (waifu) => {
+                return waifu.series
+            })
+        
+
+            for (const [key, value] of Object.entries(grouped)) {
+                if (key.toLowerCase().split(" ").includes(animeName.toLowerCase()) || key.toLowerCase() == animeName.toLowerCase() || animeName.toLowerCase().split(" ").includes(key.toLowerCase())){
+                    value.forEach( (waifu) => {
+                        response += waifu.name + ", " + waifu.id + "\n"
+                    })
+                    response += "-------------------\n"
+                }
+
+            }
+        }
+    })
+
+    let responses = response.match(/(?=[\s\S])(?:.*\n?){1,100}/g)
+
+    if (responses){
+        for (let block of responses) {
+            try {
+                await ctx.reply(block)
+                await sleep(500) 
+            } catch (error) {
+                console.error(error)
+            }
+        }
+    }
 })
 
 export const listCommand = Composer.command('list', async (ctx) => {
