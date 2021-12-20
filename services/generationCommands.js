@@ -159,7 +159,6 @@ export const rcharCommand = Composer.command('rchar', async (ctx) => {
                         {groupInfo: JSON.stringify(groupJSON)},
                         {where: {groupID: chatID}}
                     )
-                    groupJSON = await setChatEnv(ctx)
                 } catch (err){
                     console.log(err)
                 }
@@ -172,7 +171,6 @@ export const rcharCommand = Composer.command('rchar', async (ctx) => {
                     {groupInfo: JSON.stringify(groupJSON)},
                     {where: {groupID: chatID}}
                 )
-                groupJSON = await setChatEnv(ctx)
             } catch (err){
                 console.log(err)
             }

@@ -194,7 +194,7 @@ bot.command('patch', async (ctx) => {
             groupJSON.activeWaifus = []
         }
 
-        // regenerate non-catched waifus
+        // regenerate non-catched chars
         let notGenerated = range(1, 50000)
         notGenerated = notGenerated.filter(element => {
             let result = []
