@@ -15,7 +15,7 @@ export const showCommand = Composer.command('show', async (ctx) => {
 
     let user = groupJSON.users.find(user => user.id == ctx.from.id)
     for (let waifu of user.waifus) {
-        if (waifu.name.toLowerCase().includes(waifuName.toLowerCase())){
+        if (waifu.name.toLowerCase().split(" ").includes(waifuName.toLowerCase())){
             try {
                 
                 if (photo === undefined){
