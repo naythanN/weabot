@@ -281,6 +281,7 @@ bot.command('patch', async (ctx) => {
         } catch (err){
             console.log(err)
         }
+        ctx.reply(`Tamanho combinado == ${groupJSON.waifusCaptured.length + groupJSON.waifusNotGenerated.length}`)
         ctx.reply("Patch applied successfully")
     }
     
